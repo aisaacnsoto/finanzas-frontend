@@ -1,0 +1,76 @@
+<div class="profile-container">
+  <header>
+    <h1>Mi Perfil</h1>
+  </header>
+
+  <!-- Información del Usuario -->
+  <div class="profile-info">
+    <div class="avatar">
+      <img src="assets/default-avatar.png" alt="Avatar de usuario">
+      <div class="avatar-overlay">
+        <i class="fas fa-camera"></i>
+      </div>
+    </div>
+    <div class="user-details">
+      <h2>{{ userInfo.name }}</h2>
+      <p class="email">{{ userInfo.email }}</p>
+      <p class="member-since">Miembro desde {{ userInfo.joinDate | date:'MMMM yyyy' }}</p>
+    </div>
+  </div>
+
+  <!-- Cambio de Contraseña -->
+  <div class="password-section">
+    <h3>Cambiar Contraseña</h3>
+    <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+      <div class="form-group">
+        <label>Contraseña Actual</label>
+        <input type="password" formControlName="currentPassword">
+        <div class="error-message" *ngIf="passwordForm.get('currentPassword')?.errors?.['required'] &&
+                                        passwordForm.get('currentPassword')?.touched">
+          La contraseña actual es requerida
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Nueva Contraseña</label>
+        <input type="password" formControlName="newPassword">
+        <div class="error-message" *ngIf="passwordForm.get('newPassword')?.errors?.['required'] &&
+                                        passwordForm.get('newPassword')?.touched">
+          La nueva contraseña es requerida
+        </div>
+        <div class="error-message" *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">
+          La contraseña debe tener al menos 8 caracteres
+        </div>
+        <div class="error-message" *ngIf="passwordForm.get('newPassword')?.errors?.['pattern']">
+          La contraseña debe contener al menos una letra mayúscula, una minúscula y un número
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Confirmar Nueva Contraseña</label>
+        <input type="password" formControlName="confirmPassword">
+        <div class="error-message" *ngIf="passwordForm.get('confirmPassword')?.errors?.['required'] &&
+                                        passwordForm.get('confirmPassword')?.touched">
+          La confirmación de contraseña es requerida
+        </div>
+        <div class="error-message" *ngIf="passwordForm.errors?.['passwordMismatch'] &&
+                                        passwordForm.get('confirmPassword')?.touched">
+          Las contraseñas no coinciden
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn primary" [disabled]="!passwordForm.valid || isLoading">
+          <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
+          {{ isLoading ? 'Cambiando...' : 'Cambiar Contraseña' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Notificación -->
+  <div class="notification" *ngIf="notification" [class.success]="notification.type === 'success'"
+                                                [class.error]="notification.type === 'error'">
+    {{ notification.message }}
+  </div>
+</div>

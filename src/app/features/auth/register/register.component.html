@@ -1,0 +1,125 @@
+<div class="register-container">
+  <div class="register-card">
+    <h2>Crear Cuenta</h2>
+
+    <!-- Registration Form -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" *ngIf="!showVerification">
+      <div class="form-group">
+        <label for="firstname">Nombre</label>
+        <input
+          type="text"
+          id="firstname"
+          formControlName="firstname"
+          [class.error]="isFieldInvalid('firstname')"
+        >
+        <span class="error-message" *ngIf="isFieldInvalid('firstname')">
+          El nombre es requerido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="lastname">Apellido</label>
+        <input
+          type="text"
+          id="lastname"
+          formControlName="lastname"
+          [class.error]="isFieldInvalid('lastname')"
+        >
+        <span class="error-message" *ngIf="isFieldInvalid('lastname')">
+          El apellido es requerido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="phone_number">Número de Teléfono</label>
+        <input
+          type="tel"
+          id="phone_number"
+          formControlName="phone_number"
+          [class.error]="isFieldInvalid('phone_number')"
+          (blur)="checkPhoneAvailability()"
+        >
+        <span class="error-message" *ngIf="isFieldInvalid('phone_number')">
+          Ingrese un número de teléfono válido
+        </span>
+        <span class="error-message" *ngIf="phoneNumberTaken && phoneNumberChecked">
+          Este número ya está registrado
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Correo Electrónico</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          [class.error]="isFieldInvalid('email')"
+        >
+        <span class="error-message" *ngIf="isFieldInvalid('email')">
+          Ingrese un correo electrónico válido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          [class.error]="isFieldInvalid('password')"
+        >
+        <span class="error-message" *ngIf="isFieldInvalid('password')">
+          La contraseña debe tener al menos 6 caracteres
+        </span>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="registerForm.invalid || isLoading || (phoneNumberChecked && phoneNumberTaken)"
+      >
+        {{ isLoading ? 'Registrando...' : 'Registrarse' }}
+      </button>
+    </form>
+
+    <!-- Verification Form -->
+    <form [formGroup]="verificationForm" (ngSubmit)="verifyCode()" *ngIf="showVerification">
+      <div class="verification-message">
+        <p>Hemos enviado un código de verificación a tu WhatsApp</p>
+        <p class="phone-number">{{ registerForm.get('phone_number')?.value }}</p>
+      </div>
+
+      <div class="form-group verification-code">
+        <label for="code">Código de Verificación</label>
+        <input
+          type="text"
+          id="code"
+          formControlName="code"
+          maxlength="4"
+          [class.error]="isFieldInvalid('code', verificationForm)"
+        >
+        <span class="error-message" *ngIf="isFieldInvalid('code', verificationForm)">
+          Ingrese el código de 4 dígitos
+        </span>
+        <span class="error-message" *ngIf="invalidCode">
+          Código inválido
+        </span>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="verificationForm.invalid || isLoading"
+      >
+        {{ isLoading ? 'Verificando...' : 'Verificar' }}
+      </button>
+
+      <button
+        type="button"
+        class="resend-button"
+        (click)="resendCode()"
+        [disabled]="isLoading"
+      >
+        Reenviar código
+      </button>
+    </form>
+  </div>
+</div>

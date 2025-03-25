@@ -1,0 +1,149 @@
+<div class="reports-container">
+  <header>
+    <h1>Reportes Financieros</h1>
+
+    <!-- Filtros -->
+    <div class="filters">
+      <div class="date-range">
+        <select [(ngModel)]="selectedRange" (change)="updateDateRange()">
+          <option value="month">Este Mes</option>
+          <option value="quarter">Este Trimestre</option>
+          <option value="year">Este Año</option>
+          <option value="custom">Personalizado</option>
+        </select>
+
+        <div class="custom-range" *ngIf="selectedRange === 'custom'">
+          <input type="date" [(ngModel)]="startDate" (change)="loadReports()">
+          <span>hasta</span>
+          <input type="date" [(ngModel)]="endDate" (change)="loadReports()">
+        </div>
+      </div>
+
+      <button class="btn primary" (click)="exportReport()">
+        <i class="fas fa-download"></i>
+        Exportar Reporte
+      </button>
+    </div>
+  </header>
+
+  <!-- Resumen General -->
+  <section class="summary-cards">
+    <div class="summary-card income">
+      <h3>Ingresos Totales</h3>
+      <p class="amount">{{ totalIncome | currency }}</p>
+      <p class="trend" [class.positive]="incomeTrend > 0" [class.negative]="incomeTrend < 0">
+        <i class="fas" [class.fa-arrow-up]="incomeTrend > 0"
+                     [class.fa-arrow-down]="incomeTrend < 0"></i>
+        {{ Math.abs(incomeTrend) }}% vs. periodo anterior
+      </p>
+    </div>
+
+    <div class="summary-card expense">
+      <h3>Gastos Totales</h3>
+      <p class="amount">{{ totalExpenses | currency }}</p>
+      <p class="trend" [class.positive]="expenseTrend < 0" [class.negative]="expenseTrend > 0">
+        <i class="fas" [class.fa-arrow-up]="expenseTrend > 0"
+                     [class.fa-arrow-down]="expenseTrend < 0"></i>
+        {{ Math.abs(expenseTrend) }}% vs. periodo anterior
+      </p>
+    </div>
+
+    <div class="summary-card savings">
+      <h3>Ahorro Total</h3>
+      <p class="amount">{{ totalSavings | currency }}</p>
+      <p class="trend" [class.positive]="savingsTrend > 0" [class.negative]="savingsTrend < 0">
+        <i class="fas" [class.fa-arrow-up]="savingsTrend > 0"
+                     [class.fa-arrow-down]="savingsTrend < 0"></i>
+        {{ Math.abs(savingsTrend) }}% vs. periodo anterior
+      </p>
+    </div>
+
+    <div class="summary-card ratio">
+      <h3>Ratio Gastos/Ingresos</h3>
+      <p class="amount">{{ expenseRatio }}%</p>
+      <p class="description">
+        {{ expenseRatio < 80 ? 'Saludable' : 'Necesita Atención' }}
+      </p>
+    </div>
+  </section>
+
+  <!-- Gráficos -->
+  <div class="charts-grid">
+    <!-- Flujo de Efectivo -->
+    <section class="chart-section">
+      <h2>Flujo de Efectivo</h2>
+      <canvas #cashFlowChart></canvas>
+    </section>
+
+    <!-- Gastos por Categoría -->
+    <section class="chart-section">
+      <h2>Distribución de Gastos</h2>
+      <canvas #expensesChart></canvas>
+    </section>
+
+    <!-- Tendencias -->
+    <section class="chart-section full-width">
+      <h2>Tendencias Mensuales</h2>
+      <canvas #trendChart></canvas>
+    </section>
+  </div>
+
+  <!-- Análisis por Categoría -->
+  <section class="category-analysis">
+    <h2>Análisis por Categoría</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Categoría</th>
+            <th>Monto</th>
+            <th>% del Total</th>
+            <th>vs. Presupuesto</th>
+            <th>Tendencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of categoryAnalysis">
+            <td>
+              <span class="category-dot" [style.background-color]="category.color"></span>
+              {{ category.name }}
+            </td>
+            <td>{{ category.amount | currency }}</td>
+            <td>{{ category.percentage }}%</td>
+            <td>
+              <div class="progress-bar">
+                <div class="progress" [style.width]="category.budgetPercentage + '%'"
+                     [class.over-budget]="category.budgetPercentage > 100">
+                </div>
+              </div>
+              <span>{{ category.budgetPercentage }}%</span>
+            </td>
+            <td>
+              <span class="trend-indicator" [class.positive]="category.trend > 0"
+                                          [class.negative]="category.trend < 0">
+                <i class="fas" [class.fa-arrow-up]="category.trend > 0"
+                            [class.fa-arrow-down]="category.trend < 0"></i>
+                {{ Math.abs(category.trend) }}%
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Transacciones -->
+  <section class="top-transactions">
+    <h2>Mayores Gastos</h2>
+    <div class="transactions-list">
+      <div class="transaction-item" *ngFor="let transaction of topExpenses">
+        <div class="transaction-info">
+          <span class="date">{{ transaction.date | date:'dd/MM/yyyy' }}</span>
+          <span class="description">{{ transaction.description }}</span>
+          <span class="category">{{ getCategoryName(transaction.categoryId) }}</span>
+        </div>
+        <span class="amount">{{ transaction.amount | currency }}</span>
+      </div>
+    </div>
+  </section>
+</div>

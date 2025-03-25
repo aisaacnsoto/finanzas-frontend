@@ -1,0 +1,206 @@
+<div class="dashboard">
+  <!-- Header -->
+  <header class="header">
+    <h1>Dashboard Financiero</h1>
+    <div class="user-actions">
+      <button class="btn" [routerLink]="['/profile']">
+        <i class="fas fa-user"></i>
+        Mi Perfil
+      </button>
+      <button class="btn" [routerLink]="['/settings']">
+        <i class="fas fa-cog"></i>
+        Configuración
+      </button>
+      <button class="btn" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        Cerrar Sesión
+      </button>
+    </div>
+  </header>
+
+  <!-- Navigation Menu -->
+  <nav class="nav-menu">
+    <a [routerLink]="['/dashboard']" routerLinkActive="active">
+      <i class="fas fa-chart-line"></i>
+      Dashboard
+    </a>
+    <a [routerLink]="['/transactions']" routerLinkActive="active">
+      <i class="fas fa-exchange-alt"></i>
+      Transacciones
+    </a>
+    <a [routerLink]="['/budgets']" routerLinkActive="active">
+      <i class="fas fa-wallet"></i>
+      Presupuestos
+    </a>
+    <a [routerLink]="['/accounts']" routerLinkActive="active">
+      <i class="fas fa-piggy-bank"></i>
+      Cuentas
+    </a>
+    <a [routerLink]="['/categories']" routerLinkActive="active">
+      <i class="fas fa-tags"></i>
+      Categorías
+    </a>
+    <a [routerLink]="['/reports']" routerLinkActive="active">
+      <i class="fas fa-file-alt"></i>
+      Reportes
+    </a>
+  </nav>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <button class="btn primary" (click)="showQuickTransactionForm = true">
+      Registrar Transacción
+    </button>
+    <button class="btn" (click)="showQuickAccountForm = true">
+      Nueva Cuenta
+    </button>
+    <button class="btn" (click)="showQuickCategoryForm = true">
+      Nueva Categoría
+    </button>
+  </div>
+
+  <!-- Date Range Selector -->
+  <div class="date-range">
+    <select [(ngModel)]="selectedRange" (change)="updateDateRange()">
+      <option value="day">Hoy</option>
+      <option value="week">Esta Semana</option>
+      <option value="month">Este Mes</option>
+      <option value="year">Este Año</option>
+      <option value="custom">Personalizado</option>
+    </select>
+
+    <div *ngIf="selectedRange === 'custom'" class="custom-range">
+      <input type="date" [(ngModel)]="customStartDate">
+      <input type="date" [(ngModel)]="customEndDate">
+      <button (click)="updateDateRange()">Aplicar</button>
+    </div>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="charts-grid">
+    <!-- Balance Over Time -->
+    <div class="chart-container">
+      <h3>Balance en el Tiempo</h3>
+      <canvas #balanceChart></canvas>
+    </div>
+
+    <!-- Expenses by Category -->
+    <div class="chart-container">
+      <h3>Gastos por Categoría</h3>
+      <canvas #expensesChart></canvas>
+    </div>
+
+    <!-- Income by Category -->
+    <div class="chart-container">
+      <h3>Ingresos por Categoría</h3>
+      <canvas #incomeChart></canvas>
+    </div>
+
+    <!-- Budget vs Actual -->
+    <div class="chart-container">
+      <h3>Presupuesto vs. Gastos Reales</h3>
+      <canvas #budgetChart></canvas>
+      <button *ngIf="!hasBudget" class="btn" (click)="showBudgetForm = true">
+        Registrar Presupuesto
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Transaction Form Modal -->
+  <div class="modal" *ngIf="showQuickTransactionForm">
+    <div class="modal-content">
+      <h2>Nueva Transacción</h2>
+      <form [formGroup]="transactionForm" (ngSubmit)="submitTransaction()">
+        <select formControlName="type">
+          <option value="expense">Gasto</option>
+          <option value="income">Ingreso</option>
+        </select>
+
+        <input type="number" formControlName="amount" placeholder="Monto">
+
+        <select formControlName="categoryId">
+          <option *ngFor="let cat of categories"
+                  [value]="cat.id"
+                  [hidden]="cat.type !== transactionForm.get('type')?.value">
+            {{cat.name}}
+          </option>
+        </select>
+
+        <select formControlName="accountId">
+          <option *ngFor="let acc of accounts" [value]="acc.id">
+            {{acc.name}}
+          </option>
+        </select>
+
+        <input type="text" formControlName="description" placeholder="Descripción">
+
+        <div class="modal-actions">
+          <button type="submit" [disabled]="transactionForm.invalid">Guardar</button>
+          <button type="button" (click)="showQuickTransactionForm = false">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Quick Account Form Modal -->
+  <div class="modal" *ngIf="showQuickAccountForm">
+    <div class="modal-content">
+      <h2>Nueva Cuenta</h2>
+      <form [formGroup]="accountForm" (ngSubmit)="submitAccount()">
+        <input type="text" formControlName="name" placeholder="Nombre de la cuenta">
+        <input type="number" formControlName="balance" placeholder="Balance inicial">
+        <select formControlName="type">
+          <option value="savings">Ahorros</option>
+          <option value="checking">Corriente</option>
+          <option value="credit">Crédito</option>
+          <option value="cash">Efectivo</option>
+        </select>
+
+        <div class="modal-actions">
+          <button type="submit" [disabled]="accountForm.invalid">Guardar</button>
+          <button type="button" (click)="showQuickAccountForm = false">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Quick Category Form Modal -->
+  <div class="modal" *ngIf="showQuickCategoryForm">
+    <div class="modal-content">
+      <h2>Nueva Categoría</h2>
+      <form [formGroup]="categoryForm" (ngSubmit)="submitCategory()">
+        <input type="text" formControlName="name" placeholder="Nombre de la categoría">
+        <select formControlName="type">
+          <option value="expense">Gasto</option>
+          <option value="income">Ingreso</option>
+        </select>
+        <input type="color" formControlName="color">
+
+        <div class="modal-actions">
+          <button type="submit" [disabled]="categoryForm.invalid">Guardar</button>
+          <button type="button" (click)="showQuickCategoryForm = false">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Quick Budget Form Modal -->
+  <div class="modal" *ngIf="showBudgetForm">
+    <div class="modal-content">
+      <h2>Registrar Presupuesto</h2>
+      <form [formGroup]="budgetForm" (ngSubmit)="submitBudget()">
+        <select formControlName="categoryId">
+          <option *ngFor="let cat of expenseCategories" [value]="cat.id">
+            {{cat.name}}
+          </option>
+        </select>
+        <input type="number" formControlName="amount" placeholder="Monto">
+
+        <div class="modal-actions">
+          <button type="submit" [disabled]="budgetForm.invalid">Guardar</button>
+          <button type="button" (click)="showBudgetForm = false">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

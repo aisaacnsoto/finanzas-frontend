@@ -1,0 +1,77 @@
+<div class="categories-container">
+  <header>
+    <h1>Administración de Categorías</h1>
+    <button class="btn primary" (click)="showAddForm = true">Nueva Categoría</button>
+  </header>
+
+  <!-- Filtros -->
+  <div class="filters">
+    <select [(ngModel)]="selectedType" (change)="filterCategories()">
+      <option value="all">Todas las categorías</option>
+      <option value="expense">Gastos</option>
+      <option value="income">Ingresos</option>
+    </select>
+  </div>
+
+  <!-- Lista de Categorías -->
+  <div class="categories-grid">
+    <div class="category-card" *ngFor="let category of filteredCategories">
+      <div class="category-color" [style.backgroundColor]="category.color"></div>
+      <div class="category-info">
+        <h3>{{ category.name }}</h3>
+        <span class="category-type" [class.income]="category.type === 'income'">
+          {{ category.type === 'income' ? 'Ingreso' : 'Gasto' }}
+        </span>
+      </div>
+      <div class="category-actions">
+        <button class="btn" (click)="editCategory(category)">
+          <i class="fas fa-edit"></i> Editar
+        </button>
+        <button class="btn danger" (click)="deleteCategory(category.id)">
+          <i class="fas fa-trash"></i> Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Agregar/Editar Categoría -->
+  <div class="modal" *ngIf="showAddForm || editingCategory">
+    <div class="modal-content">
+      <h2>{{ editingCategory ? 'Editar' : 'Nueva' }} Categoría</h2>
+      <form [formGroup]="categoryForm" (ngSubmit)="saveCategory()">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" formControlName="name" placeholder="Nombre de la categoría">
+          <div class="error-message" *ngIf="categoryForm.get('name')?.errors?.['required'] && categoryForm.get('name')?.touched">
+            El nombre es requerido
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Tipo</label>
+          <select formControlName="type">
+            <option value="expense">Gasto</option>
+            <option value="income">Ingreso</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Color</label>
+          <input type="color" formControlName="color">
+        </div>
+
+        <div class="form-group">
+          <label>Icono (opcional)</label>
+          <input type="text" formControlName="icon" placeholder="Clase del icono (ej: fas fa-home)">
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn" (click)="cancelEdit()">Cancelar</button>
+          <button type="submit" class="btn primary" [disabled]="!categoryForm.valid">
+            {{ editingCategory ? 'Actualizar' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

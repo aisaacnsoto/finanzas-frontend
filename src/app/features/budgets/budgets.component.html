@@ -1,0 +1,68 @@
+<div class="budgets-container">
+  <header>
+    <h1>Administración de Presupuestos</h1>
+    <button class="btn primary" (click)="showAddForm = true">Nuevo Presupuesto</button>
+  </header>
+
+  <!-- Filtros -->
+  <div class="filters">
+    <select [(ngModel)]="selectedMonth" (change)="loadBudgets()">
+      <option value="1">Enero</option>
+      <option value="2">Febrero</option>
+      <option value="3">Marzo</option>
+      <option value="4">Abril</option>
+      <option value="5">Mayo</option>
+      <option value="6">Junio</option>
+      <option value="7">Julio</option>
+      <option value="8">Agosto</option>
+      <option value="9">Septiembre</option>
+      <option value="10">Octubre</option>
+      <option value="11">Noviembre</option>
+      <option value="12">Diciembre</option>
+    </select>
+    <select [(ngModel)]="selectedYear" (change)="loadBudgets()">
+      <option [value]="year" *ngFor="let year of availableYears">{{ year }}</option>
+    </select>
+  </div>
+
+  <!-- Lista de Presupuestos -->
+  <div class="budgets-list">
+    <div class="budget-item" *ngFor="let budget of budgets">
+      <div class="budget-info">
+        <h3>{{ getCategoryName(budget.categoryId) }}</h3>
+        <p class="amount">{{ budget.amount | currency }}</p>
+      </div>
+      <div class="budget-actions">
+        <button class="btn" (click)="editBudget(budget)">Editar</button>
+        <button class="btn danger" (click)="deleteBudget(budget.id)">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Agregar/Editar Presupuesto -->
+  <div class="modal" *ngIf="showAddForm || editingBudget">
+    <div class="modal-content">
+      <h2>{{ editingBudget ? 'Editar' : 'Nuevo' }} Presupuesto</h2>
+      <form [formGroup]="budgetForm" (ngSubmit)="saveBudget()">
+        <div class="form-group">
+          <label>Categoría</label>
+          <select formControlName="categoryId">
+            <option [value]="category.id" *ngFor="let category of categories">
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Monto</label>
+          <input type="number" formControlName="amount" placeholder="0.00">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn" (click)="cancelEdit()">Cancelar</button>
+          <button type="submit" class="btn primary" [disabled]="!budgetForm.valid">
+            {{ editingBudget ? 'Actualizar' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

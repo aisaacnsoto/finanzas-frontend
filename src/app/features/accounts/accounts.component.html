@@ -1,0 +1,105 @@
+<div class="accounts-container">
+  <header>
+    <h1>Administración de Cuentas</h1>
+    <button class="btn primary" (click)="showAddForm = true">Nueva Cuenta</button>
+  </header>
+
+  <!-- Filtros -->
+  <div class="filters">
+    <select [(ngModel)]="selectedType" (change)="filterAccounts()">
+      <option value="all">Todas las cuentas</option>
+      <option value="savings">Ahorros</option>
+      <option value="checking">Corriente</option>
+      <option value="credit">Crédito</option>
+      <option value="cash">Efectivo</option>
+    </select>
+  </div>
+
+  <!-- Resumen de Cuentas -->
+  <div class="accounts-summary">
+    <div class="summary-card total">
+      <h3>Balance Total</h3>
+      <p class="amount">{{ getTotalBalance() | currency }}</p>
+    </div>
+    <div class="summary-card savings">
+      <h3>Total Ahorros</h3>
+      <p class="amount">{{ getBalanceByType('savings') | currency }}</p>
+    </div>
+    <div class="summary-card credit">
+      <h3>Total Crédito</h3>
+      <p class="amount">{{ getBalanceByType('credit') | currency }}</p>
+    </div>
+  </div>
+
+  <!-- Lista de Cuentas -->
+  <div class="accounts-grid">
+    <div class="account-card" *ngFor="let account of filteredAccounts">
+      <div class="account-header" [style.backgroundColor]="account.color">
+        <h3>{{ account.name }}</h3>
+        <span class="account-type">{{ getAccountTypeLabel(account.type) }}</span>
+      </div>
+      <div class="account-body">
+        <div class="balance">
+          <span class="label">Balance</span>
+          <span class="value" [class.negative]="account.balance < 0">
+            {{ account.balance | currency }}
+          </span>
+        </div>
+      </div>
+      <div class="account-actions">
+        <button class="btn" (click)="editAccount(account)">
+          <i class="fas fa-edit"></i> Editar
+        </button>
+        <button class="btn danger" (click)="deleteAccount(account.id)">
+          <i class="fas fa-trash"></i> Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Agregar/Editar Cuenta -->
+  <div class="modal" *ngIf="showAddForm || editingAccount">
+    <div class="modal-content">
+      <h2>{{ editingAccount ? 'Editar' : 'Nueva' }} Cuenta</h2>
+      <form [formGroup]="accountForm" (ngSubmit)="saveAccount()">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" formControlName="name" placeholder="Nombre de la cuenta">
+          <div class="error-message" *ngIf="accountForm.get('name')?.errors?.['required'] && accountForm.get('name')?.touched">
+            El nombre es requerido
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Tipo</label>
+          <select formControlName="type">
+            <option value="savings">Cuenta de Ahorros</option>
+            <option value="checking">Cuenta Corriente</option>
+            <option value="credit">Tarjeta de Crédito</option>
+            <option value="cash">Efectivo</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Balance Inicial</label>
+          <input type="number" formControlName="balance" placeholder="0.00">
+          <div class="error-message" *ngIf="accountForm.get('balance')?.errors?.['required'] && accountForm.get('balance')?.touched">
+            El balance es requerido
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Color</label>
+          <input type="color" formControlName="color">
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn" (click)="cancelEdit()">Cancelar</button>
+          <button type="submit" class="btn primary" [disabled]="!accountForm.valid">
+            {{ editingAccount ? 'Actualizar' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,227 @@
+<div class="settings-container">
+  <header>
+    <h1>Configuración del Sistema</h1>
+  </header>
+
+  <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
+    <!-- Notificaciones -->
+    <section class="settings-section">
+      <h2>Notificaciones</h2>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>Alertas de Presupuesto</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="budgetAlerts">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Recibe alertas cuando te acerques al límite de tu presupuesto</p>
+        </div>
+
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>Reporte Mensual</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="monthlyReport">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Recibe un resumen mensual de tus finanzas</p>
+        </div>
+
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>Alerta de Saldo Bajo</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="lowBalanceAlert">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Recibe alertas cuando tus cuentas tengan saldo bajo</p>
+        </div>
+
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>Pagos Próximos</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="upcomingBills">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Recibe recordatorios de pagos próximos</p>
+        </div>
+
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>Gastos Inusuales</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="unusualSpending">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Recibe alertas de patrones de gasto inusuales</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cuenta Predeterminada -->
+    <section class="settings-section">
+      <h2>Cuenta Predeterminada</h2>
+      <div class="settings-grid">
+        <div class="setting-item full-width">
+          <label>Cuenta para Transacciones por Defecto</label>
+          <select formControlName="defaultAccount">
+            <option [value]="account.id" *ngFor="let account of accounts">
+              {{ account.name }}
+            </option>
+          </select>
+          <p class="setting-description">Esta cuenta se seleccionará por defecto al crear nuevas transacciones</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Visualización -->
+    <section class="settings-section">
+      <h2>Visualización</h2>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>Modo Oscuro</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="darkMode">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Cambia entre tema claro y oscuro</p>
+        </div>
+
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>Vista Compacta</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="compactView">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Muestra más información en menos espacio</p>
+        </div>
+
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>Mostrar Centavos</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="showCents">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Muestra los decimales en los montos</p>
+        </div>
+
+        <div class="setting-item">
+          <label>Moneda</label>
+          <select formControlName="currency">
+            <option value="USD">USD - Dólar Americano</option>
+            <option value="EUR">EUR - Euro</option>
+            <option value="PEN">PEN - Sol Peruano</option>
+            <option value="MXN">MXN - Peso Mexicano</option>
+          </select>
+          <p class="setting-description">Moneda predeterminada para mostrar los montos</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Automatización -->
+    <section class="settings-section">
+      <h2>Automatización</h2>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>Auto-categorizar Facturas</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="autoCategorizeBills">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Categoriza automáticamente las facturas recurrentes</p>
+        </div>
+
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>Reglas de Ahorro</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="autoSaveRules">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Aplica reglas de ahorro automático</p>
+        </div>
+
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>Transacciones Recurrentes</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="recurringTransactions">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Crea automáticamente transacciones programadas</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seguridad -->
+    <section class="settings-section">
+      <h2>Seguridad</h2>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>PIN para Transacciones</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="requirePinForTransactions">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Requiere PIN para confirmar transacciones</p>
+        </div>
+
+        <div class="setting-item">
+          <label>Tiempo de Sesión (minutos)</label>
+          <select formControlName="sessionTimeout">
+            <option value="5">5 minutos</option>
+            <option value="15">15 minutos</option>
+            <option value="30">30 minutos</option>
+            <option value="60">1 hora</option>
+          </select>
+          <p class="setting-description">Tiempo de inactividad antes de cerrar sesión</p>
+        </div>
+
+        <div class="setting-item">
+          <label class="toggle-label">
+            <span>Autenticación de Dos Factores</span>
+            <div class="toggle">
+              <input type="checkbox" formControlName="twoFactorAuth">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <p class="setting-description">Activa la verificación en dos pasos</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Botones de Acción -->
+    <div class="form-actions">
+      <button type="button" class="btn" (click)="resetToDefaults()">Restaurar Valores</button>
+      <button type="submit" class="btn primary" [disabled]="isLoading">
+        <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
+        {{ isLoading ? 'Guardando...' : 'Guardar Cambios' }}
+      </button>
+    </div>
+  </form>
+
+  <!-- Notificación -->
+  <div class="notification" *ngIf="notification" [class.success]="notification.type === 'success'"
+                                                [class.error]="notification.type === 'error'">
+    {{ notification.message }}
+  </div>
+</div>

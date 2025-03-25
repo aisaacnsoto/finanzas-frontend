@@ -1,0 +1,48 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Iniciar Sesión</h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="phone_number">Número de Teléfono</label>
+        <input
+          type="tel"
+          id="phone_number"
+          formControlName="phone_number"
+          [class.error]="isFieldInvalid('phone_number')"
+        >
+        <span class="error-message" *ngIf="isFieldInvalid('phone_number')">
+          Ingrese un número de teléfono válido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          [class.error]="isFieldInvalid('password')"
+        >
+        <span class="error-message" *ngIf="isFieldInvalid('password')">
+          La contraseña es requerida
+        </span>
+      </div>
+
+      <div class="error-message" *ngIf="loginError">
+        {{ loginError }}
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || isLoading"
+      >
+        {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+      </button>
+
+      <div class="register-link">
+        ¿No tienes una cuenta? <a routerLink="/auth/register">Regístrate aquí</a>
+      </div>
+    </form>
+  </div>
+</div>
